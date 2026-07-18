@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Single-page static recruiting profile site for Jackson Friedman (soccer goalkeeper, class of 2027). One page (`index.html`), a linked recruiting PDF, and the `assets/` tree. No build step required to view it, no package manager, no test suite, no git repo.
+Single-page static recruiting profile for Jackson Friedman (soccer goalkeeper, class of 2027), aimed at college coaches and athletic directors. No build step, no package manager, no test suite.
 
-## Running / previewing
+Repo: https://github.com/eyedz9/jacksfriedmansoccer (public)
+
+## Running
 
 Open `index.html` directly, or serve the folder:
 
@@ -14,43 +16,54 @@ Open `index.html` directly, or serve the folder:
 python -m http.server 8000
 ```
 
-All asset paths are relative (`assets/...`), so both work.
+All asset paths are relative, so both work.
 
-## Origin: Kester template
+## The live site is three files
 
-`assets/` is the near-untouched **Kester – Soccer & Sports HTML5 Template** (Reacthemes). This matters:
+- `index.html` — all markup and copy
+- `assets/css/site.css` — the entire stylesheet, self-contained, token-driven
+- `assets/js/site.js` — ~90 lines, no dependencies
 
-- The vast majority of CSS/JS/images ship with the template and are **unused by `index.html`**. Don't treat orphaned files as dead code to delete or as evidence of missing pages — the site is one page by design.
-- Class names (`rts-*`, `player-status-area`, `status-box`, `banner-heading`, `player-role`, `player-name`) come from the template. Reuse existing ones instead of inventing new markup patterns.
+Nothing else in `assets/` is loaded. Fonts come from Google Fonts (Barlow Condensed for display, Inter for body).
 
-## CSS architecture
+## Everything else in assets/ is dead template
 
-Load order in `index.html` (lines 13–16) is significant:
+`assets/` still contains the **Kester – Soccer & Sports HTML5 Template** (Reacthemes) it was originally built from: Bootstrap, jQuery, Swiper, a 28k-line compiled `main.css`, a `sass/` source tree, and hundreds of stock sport photos. **None of it is referenced.** It's retained only as an asset library. Don't wire any of it back in, and don't read `main.css` looking for current styles — the current styles are in `site.css`.
 
-1. `bootstrap.min.css` — grid + utilities (Bootstrap 5, `col-lg-*`, `row`, `container`)
-2. `all.min.css` — Font Awesome (icons used as `<i class="fab fa-instagram">`)
-3. `variables/variable1.css` — theme accent, currently `--theme-color: #e41b23`. Six interchangeable `variableN.css` palettes exist; swapping the `<link>` reskins the site.
-4. `main.css` — ~28k lines, **compiled output** of `assets/sass/main.scss`
+Two files there are still used, because they're real content: `assets/images/team/jackson.jpg` (headshot), `assets/images/latimes.jpg` and `assets/images/rotterdam.jpg` (press thumbnails).
 
-`assets/sass/` is the real source for `main.css`. There is no npm script — the template was compiled with **Prepros** (see `assets/css/variables/prepros.config`). Since no toolchain is wired up here, prefer editing the page-local `<style>` block in `index.html` for site-specific tweaks rather than regenerating `main.css`; if you do touch Sass, note `main.css` will drift until someone recompiles.
+The unused template images include several 2–3 MB JPEGs that GitHub flags on push. Deleting `assets/images/banner/`, `background/`, `gallery/`, and the other stock folders would shrink the repo substantially with no effect on the site.
 
-Non-Bootstrap layout overrides also live inline as `style="..."` attributes throughout `index.html` — the site was customized in HTML, not in Sass.
+## Copy is verbatim and must stay that way
+
+Every factual claim on the page — the Prep Soccer scouting quote, awards, measurables, references, contact details — is carried over word-for-word from the original site. **Do not write new copy, paraphrase claims, or invent stats.** If new content is needed, it has to come from the site owner. UI labels (nav items, button text) are the only text authored here.
+
+Same rule for imagery: don't generate photos of Jackson. The only headshot is the real one.
+
+## Design intent (read before changing layout)
+
+The visitor model is a coach arriving from a cold email, on a phone, filtering rather than admiring. That drives three decisions worth preserving:
+
+1. **Hero shows the four fields coaches filter on** — grad year, height, GPA, club — and nothing else. Resist adding more.
+2. **The Prep Soccer quote sits directly under the hero**, not buried mid-page, because third-party validation is what a skeptical visitor needs early. Its strongest sentence is pulled out as `.quote-lead` at display size; the rest is supporting body text.
+3. **Contact and film are reachable from anywhere** via the sticky header.
+
+Visual system: near-black base, single red accent (`--accent: #e41b23`, inherited from the original theme), chalk-line pitch motif in the hero drawn as inline SVG (penalty area + six-yard box + arc). One deliberate off-grid element: the rotated "GOALKEEPER" wordmark on the hero's left edge.
+
+Spacing runs on an 8pt scale via `--s1`–`--s7`. Use those tokens rather than raw rem values.
 
 ## Video gallery
 
-The one piece of bespoke JS, inline at the bottom of `index.html`. Pattern per gallery:
+`site.js` renders **thumbnail facades**, not live iframes. The page loads seven YouTube thumbnails; a player only mounts on click. This matters — the original site loaded seven live embeds on page load.
 
-- A `.video-gallery` wrapper containing N `.video-container` divs (each holding a YouTube `<iframe>`) and N `.video-btn` buttons.
-- Exactly one container and one button carry `active` on load.
-- The script pairs buttons to containers **by DOM index**, not by id or data attribute — `data-index` is decorative. Adding a video means adding the container and the button in matching order, or the mapping silently breaks.
-- `.video-container` is `display: none` unless `.active`; iframes stay in the DOM, so all embeds load on page load.
+- Each `.video-stage` holds one or more `.yt-facade` buttons carrying `data-yt="<videoId>"`. Exactly one has `.active`.
+- Clicking a facade appends an iframe **over** it (not replacing it) so clip-switching can tear the player down and restore the thumbnail.
+- Galleries with multiple clips get `.video-btn` tabs. **Buttons pair to facades by DOM index** — add a facade and its button in matching order or the mapping silently breaks.
+- Thumbnails use `hqdefault.jpg`, which is 4:3 with baked-in letterbox bars. `transform: scale(1.35)` on the img crops them off. Don't remove it without switching thumbnail sizes.
 
-## Known gotchas
+## Notes
 
-- **No `<body>` tag.** `</head>` at line 76 is followed directly by `<header>`; the closing `</body>` exists. Browsers recover, but be aware if adding anything that targets `body` structurally.
-- **`assets/js/main.js` throws early.** It instantiates `new Swiper(...)` near the top, but `index.html` only loads jQuery and Bootstrap — not `swiper-bundle.min.js`. The ReferenceError aborts the rest of the file (preloader, menu, counters, WOW). This is inert today because the page uses none of it; loading Swiper or removing the call is the fix if any template behavior is ever needed.
-- `assets/js/min/main.min.js` is a stale minified copy of `main.js` and is not referenced.
-
-## Content edits
-
-Player facts (position, height, weight, club, grad year, GPA, contact) live in `.status-item` blocks inside `.player-status-area`. The recruiting PDF `Jackson_Friedman-Goalkeeper_2027.pdf` is linked from the header icon row and lives at repo root — keep the filename stable or update the header link.
+- `index-legacy.html` is the pre-redesign template version, kept for reference. Not linked from anywhere.
+- The redesign fixed a bug where Dan McCarthy's reference card displayed `dmccarthy@beachfutbolclub.com` but its `mailto:` pointed at `merush@hw.com`.
+- There's a print stylesheet at the bottom of `site.css`. Coaches print these.
+- Git pushes must use the `eyedz9` GitHub account (`gh auth switch -u eyedz9`); the machine's default is `AdForge-Studios`, which lacks access. Commit email must be the noreply form (`1859434+eyedz9@users.noreply.github.com`) or GitHub rejects the push on email-privacy grounds.
