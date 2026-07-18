@@ -30,9 +30,9 @@ Nothing else in `assets/` is loaded. Fonts come from Google Fonts (Barlow Conden
 
 `assets/` still contains the **Kester – Soccer & Sports HTML5 Template** (Reacthemes) it was originally built from: Bootstrap, jQuery, Swiper, a 28k-line compiled `main.css`, a `sass/` source tree, and hundreds of stock sport photos. **None of it is referenced.** It's retained only as an asset library. Don't wire any of it back in, and don't read `main.css` looking for current styles — the current styles are in `site.css`.
 
-Two files there are still used, because they're real content: `assets/images/team/jackson.jpg` (headshot), `assets/images/latimes.jpg` and `assets/images/rotterdam.jpg` (press thumbnails).
+`assets/images/` has been stripped to the four files actually referenced: `fav.png`, `latimes.jpg`, `rotterdam.jpg`, and `team/jackson.jpg`. The template's stock photography (437 files, 119 MB) is gone. If you need to reference a template image, it isn't there anymore — it's only in git history before `e7b959b`.
 
-The unused template images include several 2–3 MB JPEGs that GitHub flags on push. Deleting `assets/images/banner/`, `background/`, `gallery/`, and the other stock folders would shrink the repo substantially with no effect on the site.
+Still present and still unused: `assets/css/` (1.4 MB), `assets/fonts/` (16 MB), `assets/sass/` (831 KB), `assets/js/vendors/` and `assets/webfonts/`. Safe to delete the same way if repo size matters again.
 
 ## Copy is verbatim and must stay that way
 
