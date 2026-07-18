@@ -26,13 +26,13 @@ All asset paths are relative, so both work.
 
 Nothing else in `assets/` is loaded. Fonts come from Google Fonts (Barlow Condensed for display, Inter for body).
 
-## Everything else in assets/ is dead template
+## The old template is gone
 
-`assets/` still contains the **Kester – Soccer & Sports HTML5 Template** (Reacthemes) it was originally built from: Bootstrap, jQuery, Swiper, a 28k-line compiled `main.css`, a `sass/` source tree, and hundreds of stock sport photos. **None of it is referenced.** It's retained only as an asset library. Don't wire any of it back in, and don't read `main.css` looking for current styles — the current styles are in `site.css`.
+The site was originally built on the **Kester – Soccer & Sports HTML5 Template** (Reacthemes). That entire stack has been deleted: stock photography (437 files), the compiled `main.css`, its `sass/` source tree, the bundled Font Awesome / icon fonts, Bootstrap, and the `variables/` palettes. `assets/` went from ~120 MB to ~1 MB.
 
-`assets/images/` has been stripped to the four files actually referenced: `fav.png`, `latimes.jpg`, `rotterdam.jpg`, and `team/jackson.jpg`. The template's stock photography (437 files, 119 MB) is gone. If you need to reference a template image, it isn't there anymore — it's only in git history before `e7b959b`.
+If you go looking for a template file, it isn't on disk — it's only in git history. Don't reintroduce any of it.
 
-Still present and still unused: `assets/css/` (1.4 MB), `assets/fonts/` (16 MB), `assets/sass/` (831 KB), `assets/js/vendors/` and `assets/webfonts/`. Safe to delete the same way if repo size matters again.
+Still present but unreferenced: `assets/js/vendors/`, `assets/js/main.js`, `assets/js/min/`. Left in place because `index-legacy.html` names them; safe to delete alongside it.
 
 ## Copy is verbatim and must stay that way
 
@@ -63,7 +63,7 @@ Spacing runs on an 8pt scale via `--s1`–`--s7`. Use those tokens rather than r
 
 ## Notes
 
-- `index-legacy.html` is the pre-redesign template version, kept for reference. Not linked from anywhere.
+- `index-legacy.html` is the pre-redesign template version. It now renders **unstyled**, since the CSS and fonts it linked have been deleted. Its only remaining value is as a plain-text record of the original copy, and git history covers that. Safe to delete.
 - The redesign fixed a bug where Dan McCarthy's reference card displayed `dmccarthy@beachfutbolclub.com` but its `mailto:` pointed at `merush@hw.com`.
 - There's a print stylesheet at the bottom of `site.css`. Coaches print these.
 - Git pushes must use the `eyedz9` GitHub account (`gh auth switch -u eyedz9`); the machine's default is `AdForge-Studios`, which lacks access. Commit email must be the noreply form (`1859434+eyedz9@users.noreply.github.com`) or GitHub rejects the push on email-privacy grounds.
